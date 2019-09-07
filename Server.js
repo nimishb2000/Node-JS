@@ -18,6 +18,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/admin', adminData.routes);
 app.use(shopRoutes);
-app.use(errorController.get404Page);
+app.use(errorController.get404);
 
 app.listen(3000);
