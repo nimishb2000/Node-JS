@@ -8,15 +8,23 @@ exports.getAddProduct = (req, res, next) => {
     });
 };
 
-exports.getProducts = (req, res, next) => {
-    req.user
-        .getProducts()
-        .then(products => {
-            res.render('admin/products', {
-                prods: products,
-                pageTitle: 'Admin Products',
-                path: '/admin/products'
-            });
+exports.postAddProducts = (req, res, next) => {
+    const title = req.body.title;
+    const imageURL = req.body.imageURL;
+    const description = req.body.description;
+    const price = req.body.price;
+    const product = new Product({
+        title: title,
+        price: price,
+        description: description,
+        imageURL: imageURL,
+        userId: req.session.userId
+    });
+    product
+        .save()
+        .then(() => {
+            console.log('Added Successfully');
+            res.redirect('/admin/products');
         })
         .catch(err => console.log(err));
 };
@@ -27,10 +35,8 @@ exports.getEditProduct = (req, res, next) => {
         return res.redirect('/');
     }
     const productID = req.params.productID;
-    req.user
-        .getProducts({where: {id: productID}})
-        .then(products => {
-            const product = products[0];
+    Product.findByPk(productID)
+        .then(product => {
             if (!product) {
                 res.redirect('/');
             }
@@ -65,22 +71,14 @@ exports.postEditProduct = (req, res, next) => {
         .catch(err => console.log(err));
 };
 
-exports.postAddProducts = (req, res, next) => {
-    const title = req.body.title;
-    const imageURL = req.body.imageURL;
-    const description = req.body.description;
-    const price = req.body.price;
-    req.user
-        .createProduct({
-        title: title,
-        imageURL: imageURL,
-        price: price,
-        description: description,
-        userId: req.user.id
-        })
-        .then(() => {
-            console.log("Added succesfully");
-            res.redirect('/admin/products');
+exports.getProducts = (req, res, next) => {
+    Product.findAll({where: {userId: req.session.userId}})
+        .then(products => {
+            res.render('admin/products', {
+                prods: products,
+                pageTitle: 'Admin Products',
+                path: '/admin/products'
+            });
         })
         .catch(err => console.log(err));
 };
