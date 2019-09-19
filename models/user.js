@@ -9,6 +9,7 @@ const User = sequelize.define('user', {
         allowNull: false,
         primaryKey: true
     },
+    resetToken: Sequelize.STRING,
     email: {
         type: Sequelize.STRING,
         allowNull: false,

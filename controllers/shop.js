@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 const Product = require('../models/product');
 const Cart = require('../models/cart');
 const Order = require('../models/order');
@@ -145,11 +146,16 @@ exports.getOrders = (req, res, next) => {
     req.user
         .getOrders({ include: ['products'] })
         .then(orders => {
-            res.render('shop/orders', {
-                path: '/orders',
-                pageTitle: 'Your Orders',
-                orders: orders
-            });
+            bcrypt.hash(toString(orders.id), 12)
+                .then(ID => {
+                    res.render('shop/orders', {
+                        path: '/orders',
+                        pageTitle: 'Your Orders',
+                        orders: orders,
+                        orderID: ID
+                    });
+                })
+                .catch(err => console.log(err));
         })
         .catch(err => console.log(err));
 };
